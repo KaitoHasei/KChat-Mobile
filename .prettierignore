@@ -1,0 +1,10 @@
+.expo
+.husky
+.eslintrc.js
+.lintstagedrc.js
+
+package.json
+package-lock.json
+node_modules
+
+assets
