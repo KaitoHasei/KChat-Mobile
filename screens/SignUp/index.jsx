@@ -1,12 +1,18 @@
 import React from 'react';
+import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useForm } from 'react-hook-form';
-import { View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
+
+import queries from '../../apollo/graphql';
 
 import { Form, FormInput, authValidation } from '../../components';
 
 import styles from './SignUpStyles';
+import { useMutation } from '@apollo/client';
+import Toast from 'react-native-toast-message';
+
+const signUpMutation = queries.mutation.signUp;
 
 const SignUp = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -17,7 +23,30 @@ const SignUp = ({ navigation }) => {
     handleSubmit
   } = useForm();
 
-  const onSubmit = data => {};
+  const [signUp, { loading }] = useMutation(signUpMutation, {
+    onCompleted: () => {
+      navigation.navigate('SignIn');
+    },
+    onError: error => {
+      if (error.networkError.statusCode === 400)
+        Toast.show({
+          type: 'error',
+          text1: 'Account has created!'
+        });
+    }
+  });
+
+  const onSubmit = data => {
+    return signUp({
+      variables: {
+        inputs: {
+          username: data?.username,
+          email: data?.email,
+          password: data?.password
+        }
+      }
+    });
+  };
 
   return (
     <View
@@ -29,6 +58,7 @@ const SignUp = ({ navigation }) => {
         paddingRight: insets.right
       }}
     >
+      <Toast />
       <Text variant="headlineMedium">Sign Up</Text>
       {/* <KeyboardAwareScrollView> */}
       <View style={styles.formWrapper}>
@@ -36,7 +66,11 @@ const SignUp = ({ navigation }) => {
           <FormInput name="username" label="User Name" />
           <FormInput name="email" label="Email" />
           <FormInput name="password" label="Password" secureTextEntry={true} />
-          <Button mode="contained" onPress={handleSubmit(onSubmit)}>
+          <Button
+            mode="contained"
+            loading={loading}
+            onPress={handleSubmit(onSubmit)}
+          >
             Submit
           </Button>
         </Form>

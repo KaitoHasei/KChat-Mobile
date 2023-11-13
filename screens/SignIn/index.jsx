@@ -1,15 +1,43 @@
+import React, { useContext } from 'react';
+import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useForm } from 'react-hook-form';
-import React from 'react';
-import { View } from 'react-native';
+import { useMutation } from '@apollo/client';
 import { Button, Text } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
+import * as SecureStore from 'expo-secure-store';
+
+import { GlobalContext } from '../../context/GlobalContext';
+import queries from '../../apollo/graphql';
 
 import { Form, FormInput, authValidation } from '../../components';
 
 import styles from './SignInStyles';
 
+const signInMutation = queries.mutation.signIn;
+
 const SignIn = ({ navigation }) => {
   const insets = useSafeAreaInsets();
+  const { setAuthenticated } = useContext(GlobalContext);
+  const [signIn, { loading: signInLoading }] = useMutation(signInMutation, {
+    onCompleted: async data => {
+      const signInData = data?.signIn || null;
+
+      await SecureStore.setItemAsync('access_token', signInData?.accessToken);
+      return setAuthenticated(true);
+    },
+    onError: error => {
+      if (
+        error.networkError.statusCode === 400 ||
+        error.networkError.statusCode === 500
+      )
+        Toast.show({
+          type: 'error',
+          text1: 'Incorrect email or password!'
+        });
+    }
+  });
+
   const {
     formState: { errors },
     register,
@@ -17,7 +45,16 @@ const SignIn = ({ navigation }) => {
     handleSubmit
   } = useForm();
 
-  const onSubmit = data => {};
+  const onSubmit = data => {
+    return signIn({
+      variables: {
+        inputs: {
+          email: data?.email,
+          password: data?.password
+        }
+      }
+    });
+  };
 
   return (
     <View
@@ -29,12 +66,17 @@ const SignIn = ({ navigation }) => {
         paddingRight: insets.right
       }}
     >
+      <Toast />
       <Text variant="headlineMedium">Log In</Text>
       <View style={styles.formWrapper}>
         <Form {...{ register, setValue, validation: authValidation, errors }}>
           <FormInput name="email" label="Email" />
           <FormInput name="password" label="Password" secureTextEntry={true} />
-          <Button mode="contained" onPress={handleSubmit(onSubmit)}>
+          <Button
+            mode="contained"
+            loading={signInLoading}
+            onPress={handleSubmit(onSubmit)}
+          >
             Submit
           </Button>
         </Form>

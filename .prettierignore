@@ -2,6 +2,7 @@
 .husky
 .eslintrc.js
 .lintstagedrc.js
+.lintstagedrc.json
 
 package.json
 package-lock.json

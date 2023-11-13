@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import React from 'react';
 import {
   NavigationContainer,
@@ -41,6 +42,7 @@ const CombinedDarkTheme = {
   colors: {
     ...MD3DarkTheme.colors,
     ...DarkTheme.colors,
+    primary: '#8b68c5',
     surfaceVariant: 'rgba(255, 255, 255, 1)',
     onSurfaceVariant: 'rgba(255, 255, 255, 1)',
     outline: 'rgba(255, 255, 255, 1)',

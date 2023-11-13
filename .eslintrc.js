@@ -32,7 +32,7 @@ module.exports = {
         endOfLine: 'auto'
       }
     ],
-    'no-console': 'warn',
-    'comma-dangle': 'off'
+    'comma-dangle': 'off',
+    'no-console': 'warn'
   }
 };
