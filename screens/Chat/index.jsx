@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { FlatList, View } from 'react-native';
 import { useQuery } from '@apollo/client';
 import _ from 'lodash';
@@ -35,8 +35,10 @@ const Chat = ({ navigation }) => {
           subscriptionData.data.hasUpdateConversation.conversation;
         const oldConversations = prev.getConversations;
 
-        const removedExistConversation = oldConversations.filter(
-          conversation => !conversation.id === conversationUpdated.id
+        const removedExistConversation = oldConversations?.filter(
+          conversation => {
+            return conversation['id'] != conversationUpdated['id'];
+          }
         );
 
         return Object.assign({}, prev, {

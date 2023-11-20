@@ -55,25 +55,26 @@ const splitLink = split(
 
 const client = new ApolloClient({
   link: splitLink,
-  cache: new InMemoryCache({
-    typePolicies: {
-      Query: {
-        fields: {
-          getConversationMessages: {
-            keyArgs: false,
-            merge(existing = [], incoming = []) {
-              const firstExisting = existing?.[0]?.createdAt || null;
-              const firstIncoming = incoming?.[0]?.createdAt || null;
-              const isFetchMore = firstExisting !== firstIncoming;
+  cache: new InMemoryCache()
+  //   {
+  //   typePolicies: {
+  //     Query: {
+  //       fields: {
+  //         getConversationMessages: {
+  //           keyArgs: false,
+  //           merge(existing = [], incoming = []) {
+  //             const firstExisting = existing?.[0]?.createdAt || null;
+  //             const firstIncoming = incoming?.[0]?.createdAt || null;
+  //             const isFetchMore = firstExisting !== firstIncoming;
 
-              if (!isFetchMore) return incoming;
-              return [...incoming, ...existing];
-            }
-          }
-        }
-      }
-    }
-  })
+  //             if (!isFetchMore) return incoming;
+  //             return [...incoming, ...existing];
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 });
 
 export { client };

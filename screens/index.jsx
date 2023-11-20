@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { useQuery } from '@apollo/client';
+import { useApolloClient, useQuery } from '@apollo/client';
 import { ActivityIndicator, IconButton } from 'react-native-paper';
 import * as SecureStore from 'expo-secure-store';
 
@@ -18,11 +17,11 @@ import SearchUser from '../modules/SearchUser';
 import FeedViewHeader from '../modules/FeedViewHeader';
 
 const Stack = createNativeStackNavigator();
-const Drawer = createDrawerNavigator();
 
 const getProfileQuery = queries.query.getProfile;
 
 const AuthenticatedScreen = () => {
+  const client = useApolloClient();
   const { setUser, setAuthenticated } = useContext(GlobalContext);
 
   const { loading } = useQuery(getProfileQuery, {
@@ -55,8 +54,9 @@ const AuthenticatedScreen = () => {
                   icon="logout"
                   size={20}
                   iconColor="red"
-                  onPress={() => {
-                    SecureStore.deleteItemAsync('access_token');
+                  onPress={async () => {
+                    client.cache.reset();
+                    await SecureStore.deleteItemAsync('access_token');
                     setAuthenticated(false);
                   }}
                 />

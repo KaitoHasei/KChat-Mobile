@@ -49,12 +49,12 @@ const FeedView = ({ route, navigation }) => {
   } = useQuery(getMessageQuery, {
     variables: {
       inputs: {
-        conversationId,
-        offset: OFFSET_INIT,
-        limit: LIMIT_INIT
+        conversationId
+        // offset: OFFSET_INIT,
+        // limit: LIMIT_INIT
       }
     },
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'cache-and-network'
   });
 
   const messages = conversationMessages?.getConversationMessages || [];
@@ -147,12 +147,12 @@ const FeedView = ({ route, navigation }) => {
                 />
               );
             }}
-            onEndReached={() => handleFetchMoreMessages()}
+            // onEndReached={() => handleFetchMoreMessages()}
           />
         )}
       </>
     );
-  }, [user, messages, conversation]);
+  }, [messages, conversation]);
 
   return (
     <>
